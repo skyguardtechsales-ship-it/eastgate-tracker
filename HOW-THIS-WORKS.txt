@@ -1,0 +1,96 @@
+HOSPITALITY TEAM TRACKER — HOW IT WORKS AND HOW IT'S SET UP
+East Gate on Copper, Albuquerque
+Written 2026-11-05
+
+LIVE LINK
+  https://skyguardtechsales-ship-it.github.io/eastgate-tracker/
+  Works in any browser. Add it to your phone's home screen (Share -> Add to Home Screen)
+  and it behaves like an app.
+
+
+THE THREE PIECES
+
+  1. THE PAGE  (GitHub)
+     - One file, index.html, in the GitHub repo "skyguardtechsales-ship-it/eastgate-tracker".
+     - GitHub Pages serves that file at the live link above. Free.
+     - The page is the "app": the tabs, the Sunday lineup tree, the picker, the timeline.
+     - It contains NO data. Swap it a hundred times and nothing is lost.
+
+  2. THE DATA  (Firebase / Firestore)
+     - Firebase project: "eastgate-hospitality" (console.firebase.google.com, signed in as
+       skyguardtechsales@gmail.com). Free "Spark" plan.
+     - Every project, objective, volunteer, lineup and weekly improvement is a small record in
+       the Firestore database. The page reads and writes those records live, so two people
+       looking at the page see the same thing within a second or two.
+     - Collections: projects, volunteers, improvements, lineups, settings/plan.
+
+  3. THE LOCK  (Firebase Authentication + Firestore rules)
+     - The page opens with a "Continue with Google" screen.
+     - Firestore rules (Firebase console -> Firestore Database -> Rules) list the Gmail
+       addresses allowed in. Anyone else can open the page but gets no data and can't save.
+     - Currently allowed: skyguardtechsales@gmail.com (+ a placeholder for a partner).
+     - The page ALSO has a TEAM_EMAILS list near the top of index.html, but that is only for
+       display. The rules are the real gate.
+
+
+HOW TO CHANGE THINGS
+
+  Change the page (new feature, new look, bug fix)
+     Tell Claude what you want. Claude edits index.html, tests it, and pushes it to GitHub.
+     The live link updates in about a minute. Hard-refresh if a phone still shows the old one.
+     Manual fallback: GitHub repo -> Add file -> Upload files -> drop in index.html -> Commit.
+
+  Roll back a change
+     Every push is saved in Git. Ask Claude to revert, or in GitHub open the file's History.
+
+  Add a person (your partner, a third team member)
+     1. Firebase console -> Firestore Database -> Rules tab.
+     2. Add their Gmail (lowercase) to the list inside onTeam(), keep the quotes and commas.
+     3. Click Publish.
+     4. (Optional, cosmetic) Add the same email to TEAM_EMAILS in index.html and push.
+     They then open the live link and sign in with that Google account. No Claude account,
+     no GitHub account needed on their side.
+
+  Remove a person
+     Delete their email from the rules and Publish. They're locked out immediately.
+
+  Add a job / position
+     In the page itself: Volunteers tab -> "+ Add job". No code change needed.
+
+  Back up the data
+     Plan & Settings -> Export (copy to clipboard) -> paste into a .json file in
+     00_Hospitality Team Tracker\exports\. Import restores it the same way.
+     Firestore itself is durable; this is belt-and-suspenders.
+
+
+WHERE THE FILES ARE ON YOUR COMPUTER
+  Desktop\East Gate\00_Hospitality Team Tracker\
+     github-upload\index.html        the current live page (same as the repo)
+     github-upload\firestore.rules   a copy of the rules (the live rules are in Firebase)
+     github-upload\SETUP.md          the original setup walkthrough
+     exports\                        put JSON backups here
+
+
+ACCOUNTS INVOLVED (all free)
+  Google   skyguardtechsales@gmail.com   owns the Firebase project; also how you sign in to the page
+  GitHub   skyguardtechsales-ship-it     owns the repo and the live link
+  Claude   connected to the GitHub repo so Claude can push updates for you
+
+
+ROLLOVER RULES BUILT INTO THE PAGE
+  - Sunday lineup shows the coming Sunday until 5:00 PM on Sunday, then flips to the next one.
+    Past Sundays are kept; use the arrows to look back or plan ahead.
+  - "This week" on the Weekly Improvement tab runs Monday to Sunday.
+  - Marketing phases (Gather / Build / Grow) come from Plan & Settings; the header strip and
+    timeline follow those dates automatically.
+
+
+IF SOMETHING LOOKS WRONG
+  "Saved on this device only" in the top bar   -> you're not signed in, or Firebase is unreachable.
+                                                   Sign out and back in.
+  "Not on the team list"                        -> that Gmail isn't in the Firestore rules.
+  Sign-in popup blocked on a phone              -> the page falls back to a redirect sign-in; allow it.
+  Live link shows an old version                -> wait a minute, then hard-refresh (Ctrl+Shift+R).
+  Google sign-in says "unauthorized domain"     -> Firebase -> Authentication -> Settings ->
+                                                   Authorized domains must include
+                                                   skyguardtechsales-ship-it.github.io (it does today).
